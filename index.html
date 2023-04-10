@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Search Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #f0f0f0;
+        }
+
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="text"] {
+        background-color: #333;
+        border: 1px solid #444;
+        color: #f0f0f0;
+        padding: 5px;
+        }
+
+        .search-bar input[type="submit"] {
+        background-color: #5f7082;
+        border: none;
+        color: #f0f0f0;
+        padding: 5px 10px;
+        cursor: pointer;
+         }
+
+
+        .search-bar input[type="submit"]:hover {
+            background-color: #6f84a2;
+        }
+
+        .hacker-news {
+            width: 50%;
+            margin: 50px auto;
+        }
+
+        .hacker-news ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .hacker-news li {
+            margin-bottom: 10px;
+        }
+        
+        .discuss-link {
+        margin-left: 5px;
+        color: #aaa;
+        }
+
+
+        a {
+            color: #bfc6cf;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .points {
+            margin-left: 5px;
+            color: #aaa;
+        }
+
+    </style>
+</head>
+<body>
+
+
+    <div class="search-container">
+        <form class="search-bar" action="https://www.google.com/search" method="get">
+            <input type="text" name="q" placeholder="Search with Google">
+            <input type="submit" value="Google Search">
+        </form>
+
+        <form class="search-bar" action="https://search.brave.com/search" method="get">
+            <input type="text" name="q" placeholder="Search with Brave">
+            <input type="submit" value="Brave Search">
+        </form>
+    </div>
+
+    <div class="hacker-news">
+        <ul id="hacker-news-list">
+        </ul>
+    </div>
+
+    <script>
+        
+        const hackerNewsList = document.getElementById('hacker-news-list');
+
+        async function fetchTopStories() {
+            const response = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+            const data = await response.json();
+            return data.slice(0, 15);
+        }
+
+        async function fetchStoryData(storyId) {
+            const response = await fetch(`https://hacker-news.firebaseio.com/v0/item/${storyId}.json`);
+            const data = await response.json();
+            return data;
+        }
+
+        async function displayTopStories() {
+    const topStories = await fetchTopStories();
+
+    for (const storyId of topStories) {
+        const storyData = await fetchStoryData(storyId);
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        const points = document.createElement('span');
+
+        link.href = storyData.url;
+        link.textContent = storyData.title;
+        const discussLink = document.createElement('a');
+        discussLink.href = `https://news.ycombinator.com/item?id=${storyData.id}`;
+        discussLink.textContent = 'Discussion ';
+        discussLink.className = 'discuss-link';
+
+
+        points.textContent = `(${storyData.score} points)`;
+        points.className = 'points';
+
+        listItem.appendChild(discussLink);
+        listItem.appendChild(link);
+        listItem.appendChild(points);
+        hackerNewsList.appendChild(listItem);
+        
+
+    }
+}
+        displayTopStories();
+    </script>
+</body>
+</html>
