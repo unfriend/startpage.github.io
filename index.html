@@ -12,7 +12,6 @@
             color: #f0f0f0;
         }
 
-
         .search-container {
             display: flex;
             flex-direction: column;
@@ -38,7 +37,6 @@
         padding: 5px 10px;
         cursor: pointer;
          }
-
 
         .search-bar input[type="submit"]:hover {
             background-color: #6f84a2;
@@ -91,9 +89,21 @@
             margin-right: 10px;
         }
 
+        .matrix-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
     </style>
 </head>
 <body>
+    <div class="matrix-container">
+        <canvas id="matrixCanvas"></canvas>
+    </div>
 
     <div class="link-container">
         <a href="https://news.ycombinator.com/" class="spaced-link">hackernews</a>
@@ -115,7 +125,43 @@
     </div>
 
     <script>
-        
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.outerWidth;
+        canvas.height = window.outerHeight;
+
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        // Initialize the drops array with random y-coordinates
+        for (let x = 0; x < columns; x++) {
+            drops[x] = Math.floor(Math.random() * (canvas.height / fontSize));
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#008000';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = String.fromCharCode(Math.random() * 128);
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 80);
+
+
         const hackerNewsList = document.getElementById('hacker-news-list');
 
         async function fetchTopStories() {
